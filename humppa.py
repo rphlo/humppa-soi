@@ -40,7 +40,7 @@ class Player():
             command = raw_input('[P]lay / [N]ext / [S]earch / [Q]uit')
             if command.lower() == 'p':
                 self.play()
-            elif command.lower == 'n':
+            elif command.lower() == 'n':
                 self.load_random_song()
                 continue
             elif command.lower() == 's':
