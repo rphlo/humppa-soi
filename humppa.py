@@ -32,14 +32,15 @@ class Player():
             except InvalidLogin:
                 print('Login Failed')
 
+        self.load_random_song()
         while True:
-            self.load_random_song()
             print("\033[H\033[J")
             print('Next: {}'.format(self.current_song.title))
             command = raw_input('[P]lay / [N]ext / [S]earch / [Q]uit')
             if command.lower() == 'p':
                 self.play()
             elif command.lower == 'n':
+                self.load_random_song()
                 continue
             elif command.lower() == 's':
                 self.prompt_search()
@@ -56,6 +57,9 @@ class Player():
             }
         )
         results = [Song(s)for s in r.json()]
+        if len(results) == 0:
+            print('No results')
+            return
         for i, song in enumerate(results):
             print('{}. {}'.format(i+1, song.title))
 
@@ -73,6 +77,7 @@ class Player():
         curl_process = subprocess.Popen(
             [
                 'curl',
+                '-q',
                 '{}.mp3?auth_token={}'.format(
                     self.current_song.mp3_url,
                     self.token
@@ -84,7 +89,7 @@ class Player():
         )
         mpg123_process = subprocess.Popen(
             [
-                'mpg123',
+                'mpg321',
                 '-',
                 '-q',
             ],
@@ -100,9 +105,12 @@ class Player():
                     break
             except KeyboardInterrupt:
                 quit = True
+                curl_process.kill()
+                mpg123_process.kill()
                 break
+
+        self.load_random_song()
         if not quit:
-            self.load_random_song()
             self.play()
 
 
