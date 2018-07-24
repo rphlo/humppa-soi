@@ -7,6 +7,7 @@ import subprocess
 
 BASE_URL = 'https://www.humppakone.com/'
 
+
 class InvalidLogin(Exception):
     pass
 
