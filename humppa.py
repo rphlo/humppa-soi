@@ -75,39 +75,30 @@ class Player:
     def play(self):
         print("\033[H\033[J")
         print('Playing: {}'.format(self.current_song.title))
-        curl_process = subprocess.Popen(
-            [
-                'curl',
-                '-q',
-                '{}.mp3?auth_token={}'.format(
-                    self.current_song.mp3_url,
-                    self.token
-                )
-             ],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+        full_mp3_url = '{}.mp3?auth_token={}'.format(
+            self.current_song.mp3_url,
+            self.token
         )
-        mpg123_process = subprocess.Popen(
+        mpv_process = subprocess.Popen(
             [
-                'mpg321',
-                '-',
-                '-q',
+                'mpv',
+                full_mp3_url,
+                '--quiet',
+                '--no-video',
             ],
-            stdin=curl_process.stdout,
+            stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
         quit = False
         while True:
             try:
-                nextline = mpg123_process.stdout.readline()
-                if nextline == '' and curl_process.poll() is not None:
+                nextline = mpv_process.stdout.readline()
+                if nextline == '' and mpv_process.poll() is not None:
                     break
             except KeyboardInterrupt:
                 quit = True
-                curl_process.kill()
-                mpg123_process.kill()
+                mpv_process.kill()
                 break
 
         self.load_random_song()
